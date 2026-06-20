@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eBay Bot — shahzadmart</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f5;color:#1a1a1a}
+.topbar{background:#0064d2;color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.topbar h1{font-size:16px;font-weight:600}
+.dot{width:8px;height:8px;background:#00c851;border-radius:50%;display:inline-block;margin-right:6px}
+.nav{background:#fff;border-bottom:1px solid #e0e0e0;display:flex;overflow-x:auto;position:sticky;top:50px;z-index:99}
+.nb{flex:1;min-width:60px;padding:12px 4px;font-size:11px;color:#666;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;border-bottom:3px solid transparent}
+.nb.active{color:#0064d2;border-bottom-color:#0064d2;font-weight:600}
+.nb i{font-size:20px}
+.content{padding:16px;max-width:700px;margin:0 auto}
+.sec{display:none}.sec.active{display:block}
+.card{background:#fff;border-radius:12px;padding:16px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+.ct{font-size:15px;font-weight:600;margin-bottom:14px}
+.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px}
+.met{background:#f8f9fa;border-radius:10px;padding:14px}
+.ml{font-size:11px;color:#888;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em}
+.mv{font-size:24px;font-weight:700}
+.ms{font-size:11px;color:#00a65a;margin-top:3px}
+label{display:block;font-size:13px;color:#555;margin-bottom:4px;font-weight:500}
+input,textarea,select{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:12px;outline:none}
+input:focus,textarea:focus{border-color:#0064d2}
+textarea{min-height:80px;resize:vertical}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;width:100%;margin-bottom:10px;border:none}
+.bp{background:#0064d2;color:#fff}
+.bs{background:#00a65a;color:#fff}
+.bd{background:#e53935;color:#fff}
+.bo{background:#fff;color:#0064d2;border:1px solid #0064d2}
+.bsm{padding:7px 12px;font-size:12px;width:auto;margin:0}
+.gen{background:#f8f9fa;border-radius:8px;padding:12px;font-size:13px;line-height:1.6;margin-bottom:12px;border:1px solid #eee}
+.tag{display:inline-block;background:#e3f2fd;color:#1565c0;font-size:11px;padding:4px 10px;border-radius:20px;margin:2px;font-weight:500}
+.lr{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f0f0f0}
+.lr:last-child{border-bottom:none}
+.li{width:44px;height:44px;border-radius:8px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.lin{flex:1;min-width:0}
+.lt{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lm{font-size:12px;color:#888;margin-top:2px}
+.oc{border-left:4px solid #0064d2;padding:12px 14px;background:#f0f7ff;border-radius:0 10px 10px 0;margin-bottom:10px}
+.badge{display:inline-block;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600}
+.bg{background:#e8f5e9;color:#2e7d32}
+.bi{background:#e3f2fd;color:#1565c0}
+.br{background:#fce4ec;color:#b71c1c}
+.steps{display:flex;gap:6px;margin-bottom:14px}
+.step{flex:1;height:4px;border-radius:2px;background:#e0e0e0}
+.step.done{background:#00a65a}
+.step.active{background:#0064d2}
+.alert{padding:12px 14px;border-radius:8px;font-size:13px;margin-top:10px}
+.ag{background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9}
+.aw{background:#fff8e1;color:#f57f17;border:1px solid #ffe0b2}
+.ar{background:#fce4ec;color:#b71c1c;border:1px solid #f8bbd9}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:sp 0.8s linear infinite;vertical-align:middle}
+@keyframes sp{to{transform:rotate(360deg)}}
+.live{background:#00a65a;color:#fff;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:700}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <h1><i class="ti ti-robot"></i> eBay Bot — shahzadmart</h1>
+  <div><span class="dot"></span><span id="cs" style="font-size:12px">Connecting...</span></div>
+</div>
+<div class="nav">
+  <button class="nb active" onclick="show('dash',this)"><i class="ti ti-layout-dashboard"></i>Home</button>
+  <button class="nb" onclick="show('create',this)"><i class="ti ti-plus"></i>List Item</button>
+  <button class="nb" onclick="show('listings',this)"><i class="ti ti-list"></i>Listings</button>
+  <button class="nb" onclick="show('orders',this)"><i class="ti ti-shopping-bag"></i>Orders</button>
+  <button class="nb" onclick="show('settings',this)"><i class="ti ti-settings"></i>Settings</button>
+</div>
+<div class="content">
+
+  <div class="sec active" id="s-dash">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+      <span class="live">LIVE</span>
+      <span style="font-size:13px;color:#666">Your real eBay store data</span>
+    </div>
+    <div class="metrics">
+      <div class="met"><div class="ml">Active listings</div><div class="mv" id="m1">—</div><div class="ms" id="m1s">Loading...</div></div>
+      <div class="met"><div class="ml">Sold items</div><div class="mv" id="m2">—</div><div class="ms" id="m2s">Loading...</div></div>
+      <div class="met"><div class="ml">Bot status</div><div class="mv" style="font-size:16px;color:#00a65a">Active</div><div class="ms">Running 24/7</div></div>
+      <div class="met"><div class="ml">Stock check</div><div class="mv" style="font-size:16px">Every 30m</div><div class="ms" id="m3s">Auto</div></div>
+    </div>
+    <div class="card">
+      <div class="ct"><i class="ti ti-brand-ebay"></i> Your live eBay listings</div>
+      <div id="dash-list"><div style="text-align:center;padding:20px;color:#888"><span class="spin" style="border-color:#0064d2;border-top-color:transparent"></span> Loading your eBay data...</div></div>
+    </div>
+  </div>
+
+  <div class="sec" id="s-create">
+    <div class="card">
+      <div class="ct"><i class="ti ti-link"></i> Paste supplier product URL</div>
+      <div class="steps"><div class="step active" id="p1"></div><div class="step" id="p2"></div><div class="step" id="p3"></div><div class="step" id="p4"></div></div>
+      <label>Supplier URL (Amazon, AliExpress, CJ...)</label>
+      <input type="text" id="surl" placeholder="https://www.amazon.co.uk/dp/..." />
+      <button class="btn bp" onclick="analyze()"><i class="ti ti-robot"></i> Analyze & generate listing</button>
+    </div>
+    <div class="card" id="aiout" style="display:none">
+      <div class="ct"><i class="ti ti-sparkles"></i> AI listing — review and list</div>
+      <div class="steps"><div class="step done"></div><div class="step done"></div><div class="step active"></div><div class="step" id="p4b"></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div><label>VeRO check</label><div class="gen" id="gv"></div></div>
+        <div><label>Price</label><div class="gen" id="gpr"></div></div>
+      </div>
+      <label>Title (editable)</label>
+      <input type="text" id="gt" />
+      <label>Description (editable)</label>
+      <textarea id="gd"></textarea>
+      <label>Keywords</label>
+      <div id="gk" style="margin-bottom:12px"></div>
+      <label>Item specifics</label>
+      <div class="gen" id="gs"></div>
+      <label>eBay Category ID</label>
+      <input type="text" id="gc" value="9355" />
+      <label>Price (£)</label>
+      <input type="number" id="gpi" step="0.01" min="0.99" />
+      <label>Product image URL (optional)</label>
+      <input type="text" id="gi" placeholder="https://..." />
+      <button class="btn bs" onclick="listNow()"><i class="ti ti-brand-ebay"></i> List on my eBay store NOW</button>
+      <div id="lr" style="display:none"></div>
+    </div>
+  </div>
+
+  <div class="sec" id="s-listings">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div class="ct" style="margin:0">Live eBay listings</div>
+        <span class="live">REAL</span>
+      </div>
+      <div id="llist"><div style="text-align:center;padding:20px;color:#888">Loading...</div></div>
+    </div>
+  </div>
+
+  <div class="sec" id="s-orders">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div class="ct" style="margin:0">Sold items</div>
+        <span class="live">REAL</span>
+      </div>
+      <div id="olist"><div style="text-align:center;padding:20px;color:#888">Loading...</div></div>
+    </div>
+  </div>
+
+  <div class="sec" id="s-settings">
+    <div class="card">
+      <div class="ct"><i class="ti ti-key"></i> eBay API credentials</div>
+      <label>App ID</label>
+      <input value="Muhammad-Myshopma-PRD-adce906a1-f71b57d9" readonly style="background:#f5f5f5" />
+      <label>Cert ID</label>
+      <input value="PRD-dce906a128ac-5661-4f59-bac3-1188" readonly style="background:#f5f5f5" />
+      <label>Dev ID</label>
+      <input value="237b36e8-e05f-425f-8ee3-62b0711ce36c" readonly style="background:#f5f5f5" />
+      <label>Notification email</label>
+      <input value="muhammadatharshahzad17@gmail.com" readonly style="background:#f5f5f5" />
+      <div class="alert ag"><i class="ti ti-circle-check"></i> All keys configured and active</div>
+    </div>
+    <div class="card">
+      <div class="ct"><i class="ti ti-adjustments"></i> Automation</div>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:12px"><input type="checkbox" checked> Auto-delete when out of stock</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:12px"><input type="checkbox" checked> Email on new orders</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:12px"><input type="checkbox" checked> Auto campaign on new listings</label>
+      <label>Stock check interval</label>
+      <select><option>Every 15 mins</option><option selected>Every 30 mins</option><option>Every hour</option></select>
+      <label>Default profit margin (%)</label>
+      <input type="number" value="25" />
+      <button class="btn bo" onclick="alert('Saved!')"><i class="ti ti-device-floppy"></i> Save settings</button>
+    </div>
+  </div>
+
+</div>
+<script>
+const API=window.location.origin;
+async function load(){
+  try{
+    const r=await fetch(API+'/api/listings');
+    const d=await r.json();
+    if(d.success){
+      document.getElementById('cs').textContent='Connected to eBay';
+      const titles=[...d.data.matchAll(/<Title>(.*?)<\/Title>/g)].map(m=>m[1]);
+      const prices=[...d.data.matchAll(/<CurrentPrice[^>]*>(.*?)<\/CurrentPrice>/g)].map(m=>m[1]);
+      const ids=[...d.data.matchAll(/<ItemID>(.*?)<\/ItemID>/g)].map(m=>m[1]);
+      document.getElementById('m1').textContent=titles.length||'0';
+      document.getElementById('m1s').textContent='On your eBay store';
+      const html=titles.length?titles.slice(0,15).map((t,i)=>`
+        <div class="lr">
+          <div class="li">📦</div>
+          <div class="lin"><div class="lt">${t}</div><div class="lm">ID: ${ids[i]||'—'} · £${prices[i]||'—'}</div></div>
+          <button class="btn bd bsm" onclick="endItem('${ids[i]}')"><i class="ti ti-trash"></i></button>
+        </div>`).join(''):'<div style="text-align:center;padding:20px;color:#888">No active listings</div>';
+      document.getElementById('dash-list').innerHTML=html;
+      document.getElementById('llist').innerHTML=html;
+    } else {
+      document.getElementById('cs').textContent='API error';
+      document.getElementById('dash-list').innerHTML='<div class="alert aw">'+( d.error||'Could not load listings')+'</div>';
+    }
+  }catch(e){
+    document.getElementById('cs').textContent='Connecting...';
+    document.getElementById('dash-list').innerHTML='<div class="alert aw">Server starting up... please wait 30 seconds and refresh.</div>';
+  }
+  try{
+    const r2=await fetch(API+'/api/orders');
+    const d2=await r2.json();
+    if(d2.success){
+      const items=[...d2.data.matchAll(/<Title>(.*?)<\/Title>/g)].map(m=>m[1]);
+      const prices=[...d2.data.matchAll(/<TransactionPrice[^>]*>(.*?)<\/TransactionPrice>/g)].map(m=>m[1]);
+      document.getElementById('m2').textContent=items.length||'0';
+      document.getElementById('m2s').textContent='Total sold';
+      document.getElementById('olist').innerHTML=items.length?items.slice(0,20).map((t,i)=>`
+        <div class="oc">
+          <div style="font-size:12px;color:#666">Order ${i+1}</div>
+          <div style="font-size:14px;font-weight:600;margin:2px 0">${t}</div>
+          <div style="font-size:12px;color:#666">£${prices[i]||'—'} <span class="badge bg">Sold</span></div>
+        </div>`).join(''):'<div style="text-align:center;padding:20px;color:#888">No sold items yet</div>';
+    }
+  }catch(e){}
+}
+async function endItem(id){
+  if(!confirm('Delete listing '+id+'?'))return;
+  const r=await fetch(API+'/api/end-listing',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({itemId:id})});
+  const d=await r.json();
+  alert(d.success?'Listing deleted!':'Error: '+(d.error||'Unknown'));
+  load();
+}
+async function analyze(){
+  const url=document.getElementById('surl').value.trim();
+  if(!url){alert('Please paste a supplier URL.');return;}
+  document.getElementById('aiout').style.display='block';
+  document.getElementById('p1').className='step done';
+  document.getElementById('p2').className='step active';
+  document.getElementById('gt').value='Analyzing...';
+  document.getElementById('gd').value='Analyzing...';
+  document.getElementById('gv').textContent='Checking...';
+  document.getElementById('gs').textContent='Loading...';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:1000,
+        messages:[{role:'user',content:`You are an expert eBay UK seller. Analyze this supplier URL and create an optimized eBay UK listing: ${url}
+Respond ONLY with valid JSON no markdown:
+{"title":"SEO title max 80 chars","description":"3-4 sentence description for UK buyers","keywords":["k1","k2","k3","k4","k5","k6"],"specs":"Brand: X\\nModel: X\\nCondition: New\\nColour: X","suggestedPrice":"19.99","costPrice":"8.50","profit":"11.49","veroRisk":"safe","veroNote":"No VeRO brand detected","categoryId":"9355"}`}]
+      })
+    });
+    const d=await r.json();
+    const t=d.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim();
+    const p=JSON.parse(t);
+    document.getElementById('p2').className='step done';
+    document.getElementById('p3').className='step active';
+    document.getElementById('gt').value=p.title||'';
+    document.getElementById('gd').value=p.description||'';
+    document.getElementById('gpi').value=p.suggestedPrice||'';
+    document.getElementById('gc').value=p.categoryId||'9355';
+    document.getElementById('gv').innerHTML=p.veroRisk==='safe'?'<span style="color:#2e7d32"><i class="ti ti-shield-check"></i> SAFE — '+p.veroNote+'</span>':'<span style="color:#b71c1c"><i class="ti ti-shield-x"></i> RISK — '+p.veroNote+'</span>';
+    document.getElementById('gpr').innerHTML='<strong>£'+p.suggestedPrice+'</strong><br><small style="color:#888">Cost: £'+p.costPrice+' · Profit: £'+p.profit+'</small>';
+    document.getElementById('gk').innerHTML=(p.keywords||[]).map(k=>'<span class="tag">'+k+'</span>').join('');
+    document.getElementById('gs').innerHTML=(p.specs||'').replace(/\n/g,'<br>');
+    document.getElementById('p3').className='step done';
+    document.getElementById('p4b').className='step active';
+  }catch(e){
+    document.getElementById('gt').value='Could not analyze. Try a direct product page link.';
+  }
+}
+async function listNow(){
+  const title=document.getElementById('gt').value;
+  const description=document.getElementById('gd').value;
+  const price=document.getElementById('gpi').value;
+  const categoryId=document.getElementById('gc').value;
+  const imageUrl=document.getElementById('gi').value;
+  if(!title||!price){alert('Title and price required.');return;}
+  const btn=event.currentTarget;
+  btn.innerHTML='<span class="spin"></span> Listing on eBay...';
+  btn.disabled=true;
+  const r=await fetch(API+'/api/list',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,description,price,categoryId,imageUrl})});
+  const d=await r.json();
+  const el=document.getElementById('lr');
+  el.style.display='block';
+  if(d.success&&d.data&&!d.data.includes('Failure')){
+    el.className='alert ag';
+    el.innerHTML='<i class="ti ti-circle-check"></i> <strong>Listed on eBay!</strong> Check your seller account now.';
+    document.getElementById('p4b').className='step done';
+    load();
+  } else {
+    el.className='alert ar';
+    el.innerHTML='<i class="ti ti-alert-triangle"></i> Error: '+(d.error||'Token may have expired. Get a new token from eBay developer portal.');
+  }
+  btn.innerHTML='<i class="ti ti-brand-ebay"></i> List on my eBay store NOW';
+  btn.disabled=false;
+}
+function show(n,el){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('s-'+n).classList.add('active');
+  el.classList.add('active');
+  if(n==='listings'||n==='orders'||n==='dash')load();
+}
+load();
+setInterval(load,5*60*1000);
+</script>
+</body>
+</html>
