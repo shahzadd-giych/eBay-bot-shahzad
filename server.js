@@ -25,7 +25,32 @@ function headers(call) {
     'Content-Type': 'text/xml'
   };
 }
-
+app.post('/api/analyze', async (req, res) => {
+  const { url } = req.body;
+  try {
+    const response = await axios.post('https://api.anthropic.com/v1/messages', {
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1000,
+      messages: [{
+        role: 'user',
+        content: `You are an expert eBay UK seller. Analyze this supplier URL and create an optimized eBay UK listing: ${url}
+Respond ONLY with valid JSON no markdown:
+{"title":"SEO title max 80 chars","description":"3-4 sentence description","keywords":["k1","k2","k3","k4","k5","k6"],"specs":"Brand: X\\nModel: X\\nCondition: New","suggestedPrice":"19.99","costPrice":"8.50","profit":"11.49","veroRisk":"safe","veroNote":"No VeRO brand detected","categoryId":"9355"}`
+      }]
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01'
+      }
+    });
+    const text = response.data.content[0].text.replace(/```json|```/g,'').trim();
+    const result = JSON.parse(text);
+    res.json({ success: true, result });
+  } catch(e) {
+    res.json({ success: false, error: e.message });
+  }
+});
 app.get('/api/listings', async (req, res) => {
   try {
     const xml = `<?xml version="1.0" encoding="utf-8"?>
@@ -65,8 +90,8 @@ app.post('/api/list', async (req, res) => {
     <Description><![CDATA[${description}]]></Description>
     <PrimaryCategory><CategoryID>${categoryId || '9355'}</CategoryID></PrimaryCategory>
     <StartPrice>${price}</StartPrice>
-    <Country>GB</Country>
-    <Currency>GBP</Currency>
+    <Country>US</Country>
+    <Currency>USD</Currency>
     <DispatchTimeMax>3</DispatchTimeMax>
     <ListingDuration>GTC</ListingDuration>
     <ListingType>FixedPriceItem</ListingType>
