@@ -236,7 +236,38 @@ async function analyze(){
   document.getElementById('gv').textContent='Checking...';
   document.getElementById('gs').textContent='Loading...';
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{
+    async function analyze(){
+  const url=document.getElementById('surl').value.trim();
+  if(!url){alert('Please paste a supplier URL.');return;}
+  document.getElementById('aiout').style.display='block';
+  document.getElementById('p1').className='step done';
+  document.getElementById('p2').className='step active';
+  document.getElementById('gt').value='Analyzing...';
+  document.getElementById('gd').value='Analyzing...';
+  try{
+    const r=await fetch(API+'/api/analyze',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({url})
+    });
+    const d=await r.json();
+    const p=d.result;
+    document.getElementById('p2').className='step done';
+    document.getElementById('p3').className='step active';
+    document.getElementById('gt').value=p.title||'';
+    document.getElementById('gd').value=p.description||'';
+    document.getElementById('gpi').value=p.suggestedPrice||'';
+    document.getElementById('gc').value=p.categoryId||'9355';
+    document.getElementById('gv').innerHTML=p.veroRisk==='safe'?'<span style="color:#2e7d32">✓ SAFE — '+p.veroNote+'</span>':'<span style="color:#b71c1c">⚠ RISK — '+p.veroNote+'</span>';
+    document.getElementById('gpr').innerHTML='<strong>£'+p.suggestedPrice+'</strong><br><small>Cost: £'+p.costPrice+' · Profit: £'+p.profit+'</small>';
+    document.getElementById('gk').innerHTML=(p.keywords||[]).map(k=>'<span class="tag">'+k+'</span>').join('');
+    document.getElementById('gs').innerHTML=(p.specs||'').replace(/\n/g,'<br>');
+    document.getElementById('p3').className='step done';
+    document.getElementById('p4b').className='step active';
+  }catch(e){
+    document.getElementById('gt').value='Error: '+e.message;
+  }
+    }
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
