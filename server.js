@@ -6,7 +6,7 @@ const path = require('path');
 
 const app = express();
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'Public')));
 
 const EBAY_APP_ID = process.env.EBAY_APP_ID;
 const EBAY_CERT_ID = process.env.EBAY_CERT_ID;
@@ -133,4 +133,7 @@ cron.schedule('*/30 * * * *', () => {
 });
 
 const PORT = process.env.PORT || 3000;
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'Public', 'index.html'));
+});
 app.listen(PORT, () => console.log('eBay Bot running on port ' + PORT));
